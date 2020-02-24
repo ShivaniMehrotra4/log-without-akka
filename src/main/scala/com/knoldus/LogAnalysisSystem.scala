@@ -10,7 +10,6 @@ class LogAnalysisSystem extends FileOperations {
     val fileName = file.toString
     val fSource = Source.fromFile(s"$fileName")
     val countValues = fSource.getLines().flatMap(_.split(" ")).toList.groupBy((word: String) => word).view.mapValues(_.length)
-    println(Map("error" -> countValues.get("[ERROR]")) ++ Map("warn" -> countValues.get("[WARN]")) ++ Map("info" -> countValues.get("[INFO]")))
     Map("error" -> countValues.get("[ERROR]")) ++ Map("warn" -> countValues.get("[WARN]")) ++ Map("info" -> countValues.get("[INFO]"))
   }
 
