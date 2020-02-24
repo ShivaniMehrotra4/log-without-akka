@@ -10,7 +10,7 @@ class LogAnalysisSystem extends FileOperations {
     val fileName = file.toString
     val fSource = Source.fromFile(s"$fileName")
     val countValues = fSource.getLines().flatMap(_.split(" ")).toList.groupBy((word: String) => word).view.mapValues(_.length)
-    //println(Map("error" -> countValues.get("[ERROR]")) ++ Map("warn" -> countValues.get("[WARN]")) ++ Map("info" -> countValues.get("[INFO]")))
+    println(Map("error" -> countValues.get("[ERROR]")) ++ Map("warn" -> countValues.get("[WARN]")) ++ Map("info" -> countValues.get("[INFO]")))
     Map("error" -> countValues.get("[ERROR]")) ++ Map("warn" -> countValues.get("[WARN]")) ++ Map("info" -> countValues.get("[INFO]"))
   }
 
@@ -19,12 +19,20 @@ class LogAnalysisSystem extends FileOperations {
       case Nil => mapCount
       case head :: Nil =>
         val x: Map[String, Option[Int]] = countErrorsWarningsInfo(head)
-        mapCount ++ Map("error" -> x("error").getOrElse(0)) ++ Map("warn" -> x("warn").getOrElse(0)) ++ Map("Info" -> x("info").getOrElse(0))
+        val errorCount = mapCount("error")
+        val warningCount = mapCount("warn")
+        val infoCount = mapCount("info")
+        mapCount ++ Map("error" -> (x("error").getOrElse(0) + errorCount)) ++
+        Map("warn" -> (x("warn").getOrElse(0) + warningCount)) ++
+        Map("info" -> (x("info").getOrElse(0) + infoCount))
       case head :: rest =>
         val x = countErrorsWarningsInfo(head)
-        traverseFile(rest, mapCount ++ Map("Error" -> x("error").getOrElse(0))
-                           ++ Map("Warning" -> x("warn").getOrElse(0))
-                           ++ Map("Info" -> x("info").getOrElse(0)))
+        val errorCount = mapCount("error")
+        val warningCount = mapCount("warn")
+        val infoCount = mapCount("info")
+        traverseFile(rest, Map("error" -> (x("error").getOrElse(0) + errorCount)) ++
+                           Map("warn" -> (x("warn").getOrElse(0) + warningCount)) ++
+                           Map("info" -> (x("info").getOrElse(0) + infoCount)))
     }
   }
 
